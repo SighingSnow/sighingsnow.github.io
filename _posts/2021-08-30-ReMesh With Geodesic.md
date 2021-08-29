@@ -1,7 +1,12 @@
 ---
 layout: post
+toc: true
 title: "ReMesh With Geodesic"
 categories: Graphics
+tags: [remesh, geodesic, delaunay]
+author:
+   - Feichao Tian
+   - Tingyu Song
 ---
 
 ### 1 Intro
