@@ -1,4 +1,8 @@
-## ReMesh With Geodesic
+---
+layout: post
+title: "ReMesh With Geodesic"
+categories: Graphics
+---
 
 ### 1 Intro
 
