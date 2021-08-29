@@ -18,13 +18,13 @@ And this project is processed under instruction of Feichao Tian. Thanks a lot fo
 
    And below is the picture which we map the geodesic data to a texture.
 
-   <img src="../_pic/geodesic/contour.png" style="zoom:25%;" />
+   ![](/assets/geodesic/contour.png)
 
 2. We want to plug nodes on geodesic lines. First we get geodesic lines, and then plug nodes with a constant delta on it.  The delta is the plugging nodes' distance away from each other. And we can got this. The first picture is the geodesic lines we got. Blue lines are contour texture, and the yellow lines are geodesic lines.  And the second picture is the plugged points. While this time, geodesic lines is blue, and plugged point is yellow.
 
-   <img src="../_pic/geodesic/line.png" style="zoom:30%;" />
+   ![](/assets/geodesic/line.png)
 
-   <img src="../_pic/geodesic/plugged.png" style="zoom:30%;" />
+   ![](/assets/geodesic/plugged.png)
 
    
 
