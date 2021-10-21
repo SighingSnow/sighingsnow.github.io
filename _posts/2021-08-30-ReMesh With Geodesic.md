@@ -23,15 +23,56 @@ And this project is processed under instruction of Feichao Tian. Thanks a lot fo
 
    And below is the picture which we map the geodesic data to a texture.
 
-   ![](/assets/geodesic/contour.png)
+   ![Fig. 1](/assets/geodesic/contour.png)
+
+   <center>Fig. 1. countour result</center>
 
 2. We want to plug nodes on geodesic lines. First we get geodesic lines, and then plug nodes with a constant delta on it.  The delta is the plugging nodes' distance away from each other. And we can got this. The first picture is the geodesic lines we got. Blue lines are contour texture, and the yellow lines are geodesic lines.  And the second picture is the plugged points. While this time, geodesic lines is blue, and plugged point is yellow.
 
-   ![](/assets/geodesic/line.png)
+   ![Fig. 2](/assets/geodesic/line.png)
 
-   ![](/assets/geodesic/plugged.png)
+   <center>Fig. 2. geodesic line visualization</center>
 
-   
+   ![Fig. 3](/assets/geodesic/plugged.png)
 
-   
+   <center>Fig. 3. inserted nodes visualization</center>
 
+3. Third, we generate deluanay triangle from these plug nodes. We get those plug nodes and their faceID. And sort them by their faceid. After sorted, we deluanay triangulate the mesh triangle by triangle. Below is this step's result.
+
+   ![](/asserts/geodesic/deluanay.png)
+
+   <center>Fig. 4. deluanay triangulation</center>
+
+4. Fourth, we need some flip operations and merge operations to do this. In this step, we use pmp-library as our tools. We use it to do flip and merge operations. 
+
+   ![](/asserts/geodesic/flip&merge.png)
+
+   <center> Fig. 5. flip & merge operations </center>
+
+   First we do clip until there is no edges to flip or only few edges to flip. Then we do merge, merge the origin input mesh's vertex to the inserted nodes.
+
+   ![](/asserts/geodesic/merge_res.png)
+
+   <center>Fig. 6.  Final result</center>
+
+### 3 Result
+
+We've tested several models. And the program robusty is guaranteed.
+
+Below are results for complicate models.
+
+.![](/asserts/geodesic/armadillo.png)
+
+<center>Fig. 7. armadillo origin</center>
+
+![](/asserts/geodesic/armadillo_remesh.png)
+
+<center>Fig. 8. remesh armadillo</center>
+
+![](/asserts/geodesic/beetle.png)
+
+<center>Fig. 9. beetle origin</center>
+
+![](/asserts/geodesic/beetle_remesh.png)
+
+<center>Fig. 10. remesh beetle</center>
