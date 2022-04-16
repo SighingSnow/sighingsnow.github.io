@@ -1,3 +1,12 @@
+---
+layout: post
+toc: true
+title: "RISV-CPU"
+categories: Arch
+tags: [RISCV,CPU]
+author: Tingyu Song 
+---
+
 # CS61CPU
 
 Look ma, I made a CPU! Here's what I did:
