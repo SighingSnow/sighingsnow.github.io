@@ -1,7 +1,7 @@
 ---
 layout: post
 toc: true
-title: "Convert ffmpeg yuv420p frame to QVideoframe"
+title: "Convert AVframe to QVideoframe"
 categories: Multimedia
 tags: [Multimedia] [ffmpeg] [qt]
 author: Tingyu Song 
