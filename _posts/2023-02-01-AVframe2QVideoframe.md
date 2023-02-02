@@ -3,8 +3,9 @@ layout: post
 toc: true
 title: "Convert AVframe to QVideoframe"
 categories: Multimedia
-tags: [Multimedia] [ffmpeg] [qt]
-author: Tingyu Song 
+tags: [Multimedia,ffmpeg,qt]
+author: 
+  - Tingyu Song 
 ---
 
 The way to convert avframe to qvideoframe under the qt newest version(6.2).
