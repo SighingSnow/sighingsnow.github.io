@@ -18,7 +18,8 @@ paginate: 10
 
 # Uncomment the below lines and set the Disqus shortname for enabling Disqus
 # 
-# disqus:
+disqus:
+tingyusong.disqus.com/admin
 
 # Jekyll
 # ======
