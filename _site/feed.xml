@@ -1,0 +1,508 @@
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en"><generator uri="https://jekyllrb.com/" version="3.9.3">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" hreflang="en" /><updated>2023-07-26T15:48:46+08:00</updated><id>http://localhost:4000/feed.xml</id><title type="html">Tingyu Song’s Blog</title><author><name>Tingyu Song</name></author><entry><title type="html">Dijkistra Optimize</title><link href="http://localhost:4000/oi/2023/03/13/Dijkistra.html" rel="alternate" type="text/html" title="Dijkistra Optimize" /><published>2023-03-13T00:00:00+08:00</published><updated>2023-03-13T00:00:00+08:00</updated><id>http://localhost:4000/oi/2023/03/13/Dijkistra</id><content type="html" xml:base="http://localhost:4000/oi/2023/03/13/Dijkistra.html">&lt;p&gt;一种经典的优化Dijkistra算法的方法。&lt;/p&gt;
+
+&lt;h3 id=&quot;1-datastructure&quot;&gt;1 DataStructure&lt;/h3&gt;
+
+&lt;p&gt;链式前向星。&lt;/p&gt;
+
+&lt;p&gt;当采用邻接矩阵存储图时，dijkistra的时间复杂度是$O(N^2)$，而当采用邻接表或者链式前向星时，时间复杂度是$O((N+E)logN)$。所以通常来说我们会选择邻接矩阵存储边，如&lt;/p&gt;
+
+&lt;div class=&quot;language-c++ highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;vector&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;vector&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;v&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;对于边&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;1 2&lt;/code&gt;，也就是有一条从&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;1&lt;/code&gt;到&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;2&lt;/code&gt;的边，我们可以&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;v[1].push_back(2)
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;或者当边有权重时，我们可以&lt;/p&gt;
+
+&lt;div class=&quot;language-c++ highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;vector&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;vector&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;pair&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;v&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;n&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// n is the node numbers&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;v&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;emplace_back&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// 2 is the dst, and 3 is weight&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;但是因为vector的自动扩容机制，每次1.5倍扩容的话，导致部分题目不通过。因而选择链式向前星作为数据结构。&lt;/p&gt;
+
+&lt;div class=&quot;language-c++ highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;maxn&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1000000&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;cnt&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// cnt是edge的索引&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;struct&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;Edge&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+  &lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;to&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+  &lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;next&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+  &lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;w&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;edge&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;maxn&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;];&lt;/span&gt;
+&lt;span class=&quot;c1&quot;&gt;// head里记录的是cnt，比如head[1]=3,表示从1出发的点中，有1条边，这条边的索引为3&lt;/span&gt;
+&lt;span class=&quot;c1&quot;&gt;// 而如果从1出发的不只一条边，那么可以从edge[cnt]-&amp;gt;next中找到下一条边的索引。&lt;/span&gt;
+&lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;head&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;maxn&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;];&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;添加1条边的函数为&lt;/p&gt;
+
+&lt;div class=&quot;language-c++ highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;addedge&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;u&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;v&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;w&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+  &lt;span class=&quot;n&quot;&gt;cnt&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;++&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; 
+  &lt;span class=&quot;n&quot;&gt;edge&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;cnt&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;].&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;to&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;v&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+  &lt;span class=&quot;n&quot;&gt;edge&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;cnt&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;].&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;w&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;w&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+  &lt;span class=&quot;n&quot;&gt;edge&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;cnt&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;].&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;next&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;head&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;u&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;];&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// 总是指向之前的那条边&lt;/span&gt;
+  &lt;span class=&quot;c1&quot;&gt;// 把以u为首的边的集合 的最新的 边，更新为当前的边&lt;/span&gt;
+  &lt;span class=&quot;c1&quot;&gt;// 相当于每次向前找&lt;/span&gt;
+  &lt;span class=&quot;n&quot;&gt;head&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;u&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;cnt&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; 
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;遍历 以某点&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;u&lt;/code&gt;开始的边集的方法为，&lt;/p&gt;
+
+&lt;div class=&quot;language-c++ highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;for&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;i&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;head&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;u&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;];&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;head&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;!=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;i&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;head&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;u&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;].&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;next&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+  &lt;span class=&quot;c1&quot;&gt;// some code here&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h3 id=&quot;2-dijkistra-with-heap&quot;&gt;2 Dijkistra with Heap&lt;/h3&gt;
+
+&lt;p&gt;在传统的dijkistra中，每次选择距离起点最近的顶点需要$O(N)$时间，这样每次都需要耗费很久的时间。可以采用堆的方式进行优化。&lt;/p&gt;
+
+&lt;p&gt;与上面的遍历的代码结合就是如下&lt;/p&gt;
+
+&lt;div class=&quot;language-c++ highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c1&quot;&gt;// 注意这里的priority queue对pair进行排序时，首先会对first进行排序，之后对second的进行排序&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;priority_queue&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;pair&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;vector&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;pair&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;greater&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;pair&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;q&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;for&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;i&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;head&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;u&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;];&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;head&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;!=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;i&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;head&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;u&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;].&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;next&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+  	&lt;span class=&quot;k&quot;&gt;if&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;dis&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;edge&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;].&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;to&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;dis&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;u&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;+&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;edge&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;].&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;w&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+      &lt;span class=&quot;n&quot;&gt;dis&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;edge&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;].&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;to&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;dis&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;u&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;edge&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;].&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;w&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+      &lt;span class=&quot;n&quot;&gt;q&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;emplace_back&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;({&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;dis&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;edge&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;].&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;to&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;});&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h3 id=&quot;3-练习&quot;&gt;3 练习&lt;/h3&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://www.luogu.com.cn/problem/P3371&quot;&gt;P3371 单源最短路径&lt;/a&gt;&lt;/p&gt;</content><author><name>[&quot;Tingyu Song&quot;]</name></author><category term="OI" /><category term="OI" /><category term="图" /><summary type="html">一种经典的优化Dijkistra算法的方法。</summary></entry><entry><title type="html">Convert AVframe to QVideoframe</title><link href="http://localhost:4000/multimedia/2023/02/01/AVframe2QVideoframe.html" rel="alternate" type="text/html" title="Convert AVframe to QVideoframe" /><published>2023-02-01T00:00:00+08:00</published><updated>2023-02-01T00:00:00+08:00</updated><id>http://localhost:4000/multimedia/2023/02/01/AVframe2QVideoframe</id><content type="html" xml:base="http://localhost:4000/multimedia/2023/02/01/AVframe2QVideoframe.html">&lt;p&gt;The way to convert avframe to qvideoframe under the qt newest version(6.2).&lt;/p&gt;
+
+&lt;h3 id=&quot;1-questions&quot;&gt;1 Questions&lt;/h3&gt;
+
+&lt;p&gt;I have seen several ways to convert a decoded avframe to a QVideoframe by this way below.&lt;/p&gt;
+
+&lt;div class=&quot;language-c++ highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;		&lt;span class=&quot;n&quot;&gt;QVideoFrame&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;frame&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;size&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;QSize&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;_width&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;_height&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;_width&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;this&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;_format&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;pixelFormat&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;());&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;frame&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;map&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;QAbstractVideoBuffer&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;WriteOnly&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+      &lt;span class=&quot;n&quot;&gt;memcpy&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;frame&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;bits&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(),&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;buffer&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;DataY&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(),&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;size&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+      &lt;span class=&quot;n&quot;&gt;frame&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;setStartTime&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+      &lt;span class=&quot;n&quot;&gt;frame&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;unmap&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;();&lt;/span&gt;
+      &lt;span class=&quot;n&quot;&gt;Q_EMIT&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;this&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;newFrameAvailable&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;frame&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;But under the newest version of qt(6.2) , the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;frame.bits()&lt;/code&gt; can no longer be used. When using &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;frame.bits()&lt;/code&gt; you should specify which plane do you want to copy. Thus I used the code below and fails. I think as avframe has &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;data[0] data[1] data[2]&lt;/code&gt; and &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;QVideoframe&lt;/code&gt; has 3 plane, I can just copy the data from avframe to QVideoframe.&lt;/p&gt;
+
+&lt;div class=&quot;language-c highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;memcpy&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;qframe&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;bits&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;frame_&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;data&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;w&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;h&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;memcpy&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;qframe&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;bits&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;frame_&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;data&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;w&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;h&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&amp;gt;&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;memcpy&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;qframe&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;bits&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;frame_&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;data&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;w&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;h&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&amp;gt;&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;And I got the QVideoframe presents so weird.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/yuv420p2qvideoframe/1.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;h3 id=&quot;2-answers&quot;&gt;2 Answers&lt;/h3&gt;
+
+&lt;p&gt;You can use the code below to copy a yuv420 format avframe to QVideoframe by the api provided by ffmpeg.&lt;/p&gt;
+
+&lt;div class=&quot;language-c++ highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;av_image_copy_plane&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;qframe&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;bits&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;qframe&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;bytesPerLine&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;frame_&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;data&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;frame_&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;linesize&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;w&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;h&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;av_image_copy_plane&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;qframe&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;bits&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;qframe&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;bytesPerLine&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;frame_&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;data&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;frame_&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;linesize&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;w&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;h&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;av_image_copy_plane&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;qframe&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;bits&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;qframe&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;bytesPerLine&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;frame_&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;data&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;frame_&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;linesize&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;w&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;h&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;And the picture shown will get better.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/yuv420p2qvideoframe/2.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;</content><author><name>[&quot;Tingyu Song&quot;]</name></author><category term="Multimedia" /><category term="Multimedia" /><category term="ffmpeg" /><category term="qt" /><summary type="html">The way to convert avframe to qvideoframe under the qt newest version(6.2).</summary></entry><entry><title type="html">RISV-CPU</title><link href="http://localhost:4000/arch/2022/04/16/riscv-cpu.html" rel="alternate" type="text/html" title="RISV-CPU" /><published>2022-04-16T00:00:00+08:00</published><updated>2022-04-16T00:00:00+08:00</updated><id>http://localhost:4000/arch/2022/04/16/riscv-cpu</id><content type="html" xml:base="http://localhost:4000/arch/2022/04/16/riscv-cpu.html">&lt;h1 id=&quot;cs61cpu&quot;&gt;CS61CPU&lt;/h1&gt;
+
+&lt;p&gt;Look ma, I made a CPU! Here’s what I did:&lt;/p&gt;
+
+&lt;p&gt;I mainly follows the cs61c-sp22’s course. And this project gives me lot’s of sense of fulfillment.&lt;/p&gt;
+
+&lt;h3 id=&quot;1-architecture&quot;&gt;1 Architecture&lt;/h3&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/cs61c/cpu/riscv-cpu.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;These are the mainly works need to be implemented in this project.&lt;/p&gt;
+
+&lt;h3 id=&quot;2-study-experience&quot;&gt;2 Study Experience&lt;/h3&gt;
+
+&lt;p&gt;Thanks a lot to cs61c’s teacher group.  Intuitive suggestions are given in this project instructions. And here are some difficulties I met in this project.&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;
+    &lt;p&gt;Control logics. This can be implemented by ROM or HardWare. And I use ROM to realize the control logics, which can tell selection bits according to instruction name. So some comparators and constant values are used to match Opcode, funct3 and funct7 to get the instruction. And then for the first 32 instructions excluding jalr, jal, auipc and lui, I use a priority encode to map them to 0-31. And for the excluded 4 instructions, I mapped them to 0-3 and added it to 32. The map method is not so important, but the thoughts to use priority encoder is important.&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;Two level pipeline. I was stuck here at first because I didn’t make myself understood how pipeline works in lab6. This project requires to realize a 2-stage pipeline, and one is instruction fetch, the other is execution. And control hazards may occur. Here is a simple question, that is why there is no data conflicts or structural conflicts. The answer is that we only have 2-stage, and instruction fetch won’t affect the execution, it doesn’t try to read from or write to a register. But in the execution stage, we may want to use pc, whether branch instruction use pc or jump instructions use pc+4 to set rd. But when we execute, the pc is different. So except the instruction register, we also need a pc register, to store the current execute program counter. And two questions asked in the project manul is,&lt;/p&gt;
+
+    &lt;blockquote&gt;
+      &lt;p&gt;&lt;strong&gt;To MUX a no-op into stage 2, do you place it &lt;em&gt;before&lt;/em&gt; or &lt;em&gt;after&lt;/em&gt; the instruction register?&lt;/strong&gt;&lt;/p&gt;
+
+      &lt;p&gt;Answer: So, first, why we need no-op. Because control hazard may occure in this model. And candidate instruction loaded may be not what we want. So we replace it by a no-op instruction. Second, how do we know there is a control hazards. When the pc sel is true, it will jump to some other instruction, instead of the pc+4 instruction. Third, when should we do the choice. Before the next instruction loaded or after next instruction loaded. The answer is before the candidate instruction loaded. I think there is two benefits. First the mux needs time to execute, when we set it before, the cpu will run faster. And for another reason, if we set it after the instruction register, the last instruction has been executed, the pc sel is not valid.(Here I am not sure)&lt;/p&gt;
+
+      &lt;p&gt;&lt;strong&gt;What address should be requested next while the EX stage executes a no-op? Is this different than normal?&lt;/strong&gt;&lt;/p&gt;
+
+      &lt;p&gt;Answer: It’s as normal. When we execute no-op, it means there is a branch or jump. So the pc is already setted. And this side proves why we need this no-op. It need to remove the pc+4 already loaded. After no-op executes, the instruction at jump address will be loaded from Instruction Memory.&lt;/p&gt;
+    &lt;/blockquote&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Here is the logic circuit I made. So amazing.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/cs61c/cpu/logicgates.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;</content><author><name>Tingyu Song</name></author><category term="Arch" /><category term="RISCV" /><category term="CPU" /><summary type="html">CS61CPU</summary></entry><entry><title type="html">Neptune</title><link href="http://localhost:4000/arch/2022/04/11/Neptune.html" rel="alternate" type="text/html" title="Neptune" /><published>2022-04-11T00:00:00+08:00</published><updated>2022-04-11T00:00:00+08:00</updated><id>http://localhost:4000/arch/2022/04/11/Neptune</id><content type="html" xml:base="http://localhost:4000/arch/2022/04/11/Neptune.html">&lt;h2 id=&quot;neptune&quot;&gt;Neptune&lt;/h2&gt;
+
+&lt;p&gt;Neptune是浙江大学计算机组成课作业，是一个UC Berkly课程中的venus的迷你版本，支持汇编与模拟执行指令，repo将在本学期结束时公开。&lt;/p&gt;
+
+&lt;h3 id=&quot;1-设计说明&quot;&gt;1 设计说明&lt;/h3&gt;
+
+&lt;p&gt;目前的总体架构包括汇编器与模拟器。其中汇编器支持2进制，16进制输出。同时模拟器支持单步执行，断点设置，查看寄存器与内存。&lt;/p&gt;
+
+&lt;p&gt;汇编器的主要难点是，跳转指令。而这个可以通过两次扫描实现，第一遍扫描建立symbol tabel符号表，第二遍扫描替换文本中的符号以及伪指令。&lt;/p&gt;
+
+&lt;p&gt;在模拟器内存的设计上，分为Data Memory和Instruction Memory，但实际上在真实计算机中应该为1块内存。为了验证程序的正确性，保证结果的汇编结果与venus的汇编结果保持一致，指令的起始地址采用0x00000000，而数据的起始地址为0x10000000，栈指针的起始地点为0x10010000。采用两块内存而不直接使用一块的原因，一是方便与venus的计算结果同步，同时，减少应用程序的内存占用。&lt;/p&gt;
+
+&lt;h3 id=&quot;2-结果验证&quot;&gt;2 结果验证&lt;/h3&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/neptune/asm_res.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;center&gt;图1 我的汇编器运行结果&lt;/center&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/neptune/venus_asm.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;center&gt;图2 venus汇编结果&lt;/center&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/neptune/exe.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;center&gt;图3 执行斐波那契程序计算第5个斐波那契数结果&lt;/center&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/neptune/step.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;center&gt;图4 单步调试过程&lt;/center&gt;
+
+&lt;h3 id=&quot;3-结尾&quot;&gt;3 结尾&lt;/h3&gt;
+
+&lt;p&gt;这项工程是一份时间比较紧的课程作业，总体而言较为满意。但仍然缺乏了许多功能，同时对于许多UserCase考虑不全，如果之后还有机会将会继续完善这项工程。由于指令数量较多，覆盖测试可能存在疏漏。&lt;/p&gt;</content><author><name>Tingyu Song</name></author><category term="Arch" /><category term="Assmebler" /><category term="Simulater" /><category term="RISCV" /><summary type="html">Neptune</summary></entry><entry><title type="html">Delaunay triangulation</title><link href="http://localhost:4000/graphics/2021/09/03/Detri2.html" rel="alternate" type="text/html" title="Delaunay triangulation" /><published>2021-09-03T00:00:00+08:00</published><updated>2021-09-03T00:00:00+08:00</updated><id>http://localhost:4000/graphics/2021/09/03/Detri2</id><content type="html" xml:base="http://localhost:4000/graphics/2021/09/03/Detri2.html">&lt;p&gt;This is a review of reading delaunay code’s problem.&lt;/p&gt;
+
+&lt;h2 id=&quot;1-pipeline&quot;&gt;1 Pipeline&lt;/h2&gt;
+
+&lt;p&gt;This pipeline is set simply on some nodes file. Many details are omitted.&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;Read nodes file, make nodes’ which has (x,y,z) coordinate as input.&lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;Sort vertices. (&lt;em&gt;So for here I don’t know much, I may igorned some details&lt;/em&gt;). Then do some initialization.&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;Then insert them one by one into the triangle. And here comes the flip operations, you can see these operations below in the flip operation.&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h2 id=&quot;2-example&quot;&gt;2 Example&lt;/h2&gt;
+
+&lt;p&gt;Below is a simple example, that maybe helpful to understand the whole pipeline.&lt;/p&gt;
+
+&lt;h3 id=&quot;21-conditions&quot;&gt;2.1 Conditions&lt;/h3&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;
+    &lt;p&gt;Considering this, we have only 4 only points. So in this example, we will have 5 points including the infinite vertex. &lt;em&gt;A(1,4), B(4,0), C(1,0), D(4,3)&lt;/em&gt; . And we made the inf_vert as &lt;em&gt;(0,0)&lt;/em&gt;.&lt;/p&gt;
+
+    &lt;p&gt;&lt;img src=&quot;/assets/detri2/eg_cond.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;As we want to test the lawson flip, we need to construct the condition first. The program will automatically sort the vertices. So we manually construct the triangle below.&lt;/p&gt;
+  &lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h3 id=&quot;22-process&quot;&gt;2.2 Process&lt;/h3&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;
+    &lt;p&gt;Construct the first triangle.  The first triangle is &lt;em&gt;(A,B,C)&lt;/em&gt;&lt;/p&gt;
+
+    &lt;p&gt;&lt;img src=&quot;/assets/detri2/eg_ctri.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;Here when we insert &lt;em&gt;D(4,3)&lt;/em&gt;, we need to do &lt;em&gt;flip13&lt;/em&gt;. The function of &lt;em&gt;flip13&lt;/em&gt; you can see in the 3.1.&lt;/p&gt;
+
+    &lt;p&gt;And we are gonna to explain  &lt;em&gt;flip13&lt;/em&gt; in detail.&lt;/p&gt;
+
+    &lt;p&gt;So first we get 3 vertices of the first triangle.&lt;/p&gt;
+
+    &lt;div class=&quot;language-c++ highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;Vertex&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;pa&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;tt&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;].&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;org&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;();&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// pa(1,4)&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;Vertex&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;pb&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;tt&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;].&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;dest&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;();&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// pb(4,0)&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;Vertex&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;pc&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;tt&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;].&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;apex&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;();&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// pc(1,0)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;    &lt;/div&gt;
+    &lt;p&gt;And then we use a for loop to travel through the half-edges of this triangle and get all the neighbor halfedges.&lt;/p&gt;
+
+    &lt;div class=&quot;language-c++ highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;i&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;++&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+  &lt;span class=&quot;n&quot;&gt;nn&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;tt&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;].&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;esym&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;();&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// nn[0] = B-&amp;gt;A, nn[1] = C-&amp;gt;B, nn[2] = A-&amp;gt;C&lt;/span&gt;
+  &lt;span class=&quot;n&quot;&gt;tt&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;].&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ver&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;_enext_tbl&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;tt&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;].&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ver&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;];&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;    &lt;/div&gt;
+
+    &lt;p&gt;Construct three edges, &lt;em&gt;tt[0] (A,B,D), tt[1] (B,C,D), tt[2] (C,A,D)&lt;/em&gt;. This operation can be understood when the vert is in triangle. But it’s may be hard when it’s outside the triangle.&lt;/p&gt;
+
+    &lt;p&gt;&lt;img src=&quot;/assets/detri2/eg_nn.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+    &lt;p&gt;And we use the origin to nn to connect the newly created triangles. Meanwhile, we need to set boundary, exterior and some other parameters which I didn’t pay much attention to it now.&lt;/p&gt;
+
+    &lt;p&gt;&lt;strong&gt;After we create 3 new triangle(maybe), we will step into the next stage. There are some edges to flip. We need to collect them and have a check.&lt;/strong&gt;&lt;/p&gt;
+
+    &lt;p&gt;&lt;img src=&quot;/assets/detri2/eg_3new.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+    &lt;p&gt;&lt;strong&gt;Collect.&lt;/strong&gt; In &lt;em&gt;flip13&lt;/em&gt;, first we need to collect the tt[i], that is &lt;em&gt;A-&amp;gt;B, B-&amp;gt;C, C-&amp;gt;A&lt;/em&gt; these 3 edges. After this, we need to collect the paired half-edges. The code is below. From my opinion, it’s just travel around all the triangle which is adj to triangle A,B,C. And finally return back.&lt;/p&gt;
+
+    &lt;div class=&quot;language-c++ highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;do&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;N&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;set_edge_infect&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;();&lt;/span&gt;
+        &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;TriEdge&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;fqueue&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;alloc&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;N&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;N&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;N&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;eprev_esym&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;();&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;while&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;N&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;tri&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;!=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ppt&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;adj&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;tri&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;    &lt;/div&gt;
+
+    &lt;p&gt;You can see 3 other edges are pushed into the fqueue, which are to flipped.&lt;/p&gt;
+
+    &lt;p&gt;&lt;img src=&quot;/assets/detri2/eg_travel.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;And we come to the key stage. Current triangulation is not deluanay triangle. We need &lt;em&gt;lawson flip&lt;/em&gt; to check it.&lt;/p&gt;
+
+    &lt;p&gt;&lt;img src=&quot;/assets/detri2/eg_needflip.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+    &lt;p&gt;In lawson flip, we need to check the edges which may need flip operations.&lt;/p&gt;
+
+    &lt;div class=&quot;language-c++ highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;ori&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;false&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ishullflip&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;tt&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;pte&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// a-&amp;gt;b-&amp;gt;d&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;tt&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;tt&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;].&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;esym&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;();&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// c-&amp;gt;b-&amp;gt;a &lt;/span&gt;
+&lt;span class=&quot;c1&quot;&gt;// both of them or not hull triangle&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;!&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;tt&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;].&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;tri&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;is_hulltri&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;())&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+  &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;!&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;tt&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;].&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;tri&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;is_hulltri&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;())&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;c1&quot;&gt;// An interior edge.&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;op_db_verbose&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+      &lt;span class=&quot;n&quot;&gt;printf&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;      O3d: (%d, %d, %d, %d)&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\n&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;tt&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;].&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;org&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;idx&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;tt&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;].&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;dest&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;idx&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;tt&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;].&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;apex&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;idx&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;tt&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;].&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;apex&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;idx&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;ori&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;regular_test&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;tt&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;].&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;org&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(),&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;tt&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;].&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;dest&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(),&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;tt&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;].&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;apex&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(),&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;tt&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;].&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;apex&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;());&lt;/span&gt;
+  &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;    &lt;/div&gt;
+
+    &lt;p&gt;（这里有不理解，这里传进去的是&lt;em&gt;A,B,D,C&lt;/em&gt;，而Orient3D的意思是如果C在ABD平面下方则为正数返回）&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;“When the &lt;em&gt;ori&lt;/em&gt; get from the step 3 is generated, and &lt;em&gt;ori&amp;gt;0&lt;/em&gt;, then the edge is locally non-regular and non-convex.”   (这里的non-regular 以及 non-convex是什么意思。) So we need to use &lt;em&gt;flip_check&lt;/em&gt; to check how to flip this edge. And we get &lt;em&gt;AB&lt;/em&gt; intersects with &lt;em&gt;CD&lt;/em&gt;, so we need to use flip22 to delete AB.&lt;/p&gt;
+
+    &lt;p&gt;In &lt;em&gt;flip22&lt;/em&gt;, the main operation is to build two new triangle, which is &lt;em&gt;(c,d,b) and (d,c,a)&lt;/em&gt;. The result is shown below in the picture. And rebuild the connection. After &lt;em&gt;flip22&lt;/em&gt;, we can get some edges to flip, so we still go to lawson flip until all the edges needing flip are emptied.&lt;/p&gt;
+
+    &lt;p&gt;&lt;img src=&quot;/assets/detri2/eg_flip22res.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+  &lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h2 id=&quot;3-flip-operation&quot;&gt;3 Flip Operation&lt;/h2&gt;
+
+&lt;h3 id=&quot;flip&quot;&gt;FLIP&lt;/h3&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;Do FLIP operation according to the vertex pos. We have flip13, flip22, flip24, flip42 and so on.&lt;/li&gt;
+  &lt;li&gt;Then we need to get the vertices which are infected. And then push the infected edges into it. For FLIP13 and FLIP24, we not only add the origin triangle edge also the newly created 3 edges.&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h3 id=&quot;31-flip13&quot;&gt;3.1 FLIP13&lt;/h3&gt;
+
+&lt;p&gt;This situation happen’s when the vertex to be inserted is in triangle or outside the triangle.&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;
+    &lt;p&gt;Find the neighbors of triangle which the edge is on.&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;Counstruct new 3 triangles.&lt;/p&gt;
+
+    &lt;p&gt;&lt;img src=&quot;/assets/detri2/flip13.png&quot; alt=&quot;image-20210903120318607&quot; /&gt;&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;Connect the newly constructed triangles with the neighbors found previously.&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;After that, set the hull tag？ I don’t know much about it.&lt;/p&gt;
+  &lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h3 id=&quot;32-flip24&quot;&gt;3.2 FLIP24&lt;/h3&gt;
+
+&lt;p&gt;This situation happen’s when the vertex is on one edge. I made a special&lt;/p&gt;
+
+&lt;h3 id=&quot;33-flip-42&quot;&gt;3.3 FLIP 42&lt;/h3&gt;
+
+&lt;h3 id=&quot;34-flip-22&quot;&gt;3.4 FLIP 22&lt;/h3&gt;
+
+&lt;h3 id=&quot;35-lawson-flip&quot;&gt;3.5 Lawson Flip&lt;/h3&gt;
+
+&lt;p&gt;Lawson flip is to make some cases which is not a Delaunay triangulation to a Delaunay triangulation.&lt;/p&gt;
+
+&lt;p&gt;Below picture refers from &lt;a href=&quot;https://www.ti.inf.ethz.ch/ew/Lehre/CG13/lecture/Chapter 6.pdf&quot;&gt;ti.inf.ethz.ch/ew/CG13/lecture&lt;/a&gt;. So what the lawson’s flip do in the below picture is to turn (b)  to (a) in order to satisfy the constraints of Delaunay triangulation.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/detri2/lawson.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;I used a special case to test lawson flip. Below is the case, we have 4 coordinates, which is 
+\(a(0,0), b(3,0), c(0,4),d(3,3)\)
+As the algorithm random permute the vertices at the beginning, I made the first triangle manually which is (a,b,c). And now what we need to do is to insert d(3,3). Below is the situation.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/detri2/lawson_situation.png&quot; alt=&quot;image-20210903120318607&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;So, after we insert the d(3.0,3.0) into the plane. We will note d is in the external circle of  triangle(a,b,c).&lt;/p&gt;
+
+&lt;h3 id=&quot;detri2&quot;&gt;Detri2&lt;/h3&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;What’s the segment here ?&lt;/li&gt;
+  &lt;li&gt;a inf vertex&lt;/li&gt;
+  &lt;li&gt;what is hull triangle&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;process is below&lt;/p&gt;
+
+&lt;div class=&quot;language-c++ highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;initialize&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(){&lt;/span&gt;
+  &lt;span class=&quot;c1&quot;&gt;// init vertex and segment&lt;/span&gt;
+  &lt;span class=&quot;c1&quot;&gt;// a infvertex&lt;/span&gt;
+  &lt;span class=&quot;n&quot;&gt;initialize_lookup_table&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;();&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// init the bitmasks&lt;/span&gt;
+  &lt;span class=&quot;n&quot;&gt;reset_options&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;();&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;div class=&quot;language-c++ highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;Triangulation&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;tr&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;Triangulation&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;();&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;tr&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;parse_commands&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;argc&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;argv&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;tr&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;read_mesh&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;();&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;tr&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;reconstruct_mesh&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;排序之后开始插点，如果三角形为空，就从里面拿3个出来。之后还需要新建三个假的邻接三角形。接下来开始插点，插点首先要确定点的位置。进入locate_point，根据点位返回不同的结果，有在三角形里，在边上，在点上有点不理解。得到如果为逆时针，就变成顺时针。做flip操作，每一种情况都有对应的lawson flip。flip之后进行lawson flip。lawson flip实际上是说，需要递归的去翻转点边。&lt;/p&gt;
+
+&lt;div class=&quot;language-c++ highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;exactinit&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;verbose&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;noexact&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;o3dfilter&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ispfilter&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;REAL&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;maxx&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;REAL&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;maxy&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;REAL&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;maxz&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Triangulation&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;sort_vertices&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Vertex&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;vrtarray&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;arysize&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Vertex&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;**&amp;amp;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;permutarray&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+  &lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;brio_multiscale_sort2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;permutarray&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;arysize&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;so_brio_threshold&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+                          &lt;span class=&quot;n&quot;&gt;so_brio_ratio&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;so_hilbert_order&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;so_hilbert_limit&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+                          &lt;span class=&quot;n&quot;&gt;io_xmin&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;io_xmax&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;io_ymin&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;io_ymax&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;重要的类&lt;/p&gt;
+
+&lt;div class=&quot;language-c++ highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;Triangulation&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+  &lt;span class=&quot;nl&quot;&gt;public:&lt;/span&gt;
+  &lt;span class=&quot;n&quot;&gt;arraypool&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;tr_steiners&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// Stenier vertices 狭窄的顶点？？？&lt;/span&gt;
+  &lt;span class=&quot;n&quot;&gt;arraypool&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;tr_segs&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+  &lt;span class=&quot;n&quot;&gt;arraypool&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;tr_tris&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// exm这又是啥&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;
+    &lt;p&gt;Locate_point 三角形&lt;/p&gt;
+
+    &lt;p&gt;当没有三角形时从0构建1个。并且确定是顺时针还是逆时针。里面判断hull triangle。&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;Flip13 遍历三角形的所有边，拿到邻接的所有三角形。&lt;/p&gt;
+  &lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h3 id=&quot;笔记&quot;&gt;笔记&lt;/h3&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;Orient2D是一个线性规划，解一个不等式&lt;/li&gt;
+  &lt;li&gt;使用exactinit的原因可以在 &lt;a href=&quot;http://www.cs.cmu.edu/~quake/triangle.exact.html&quot;&gt;triangle_exact&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;这些名词解释很有用&lt;a href=&quot;http://www.cs.cmu.edu/~quake/triangle.defs.html&quot;&gt;definition&lt;/a&gt;&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h3 id=&quot;问题&quot;&gt;问题&lt;/h3&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;在初始化Triangulation时，初始化了一个tr_infvrt，这个tr_infvrt是什么。&lt;/li&gt;
+  &lt;li&gt;在放点的时候，要找到一个说组成的三角形位置是逆时针的，但这个edge为什么可以表示为3个点。&lt;/li&gt;
+  &lt;li&gt;locate_point没看懂。看懂了，是个线性规划。&lt;/li&gt;
+  &lt;li&gt;为什么需要维护一个内存池子，懂了因为这个池子里是需要翻转的边。&lt;/li&gt;
+  &lt;li&gt;Delaunay 45 行，&lt;/li&gt;
+  &lt;li&gt;这个locate point是不是有点类似于正弦定理，乘出来小于0就怎样，大于0就怎样。如果这个点在三角形里，他需要满足和其中的两个三角形为逆时针。&lt;/li&gt;
+  &lt;li&gt;为什么需要 _vo , _vd, _va这三个数组。&lt;/li&gt;
+  &lt;li&gt;TriEdge里的 apex(), org(), dest() 的原型是什么，org-&amp;gt;origin, dest-&amp;gt;destination,可是为什么是个函数。&lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;PSLG的定义还不太理解“&lt;em&gt;Segments&lt;/em&gt; are edges whose endpoints are vertices in the PSLG, and whose presence in any mesh generated from the PSLG is enforced.” 以及&lt;strong&gt;CCDT&lt;/strong&gt;，&lt;strong&gt;CDT&lt;/strong&gt;&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;is_hulltriangle()&lt;/li&gt;
+  &lt;li&gt;what’s flip ?&lt;/li&gt;
+  &lt;li&gt;Set_edge_infected 一个位操作&lt;/li&gt;
+  &lt;li&gt;hull flag&lt;/li&gt;
+  &lt;li&gt;what’s boundary marker?&lt;/li&gt;
+  &lt;li&gt;Flips 924  exposed edges.&lt;/li&gt;
+  &lt;li&gt;lawson’s flip  Delaunay 265 ? locally regular?&lt;/li&gt;
+  &lt;li&gt;When will flip42 and flip22 be used.&lt;/li&gt;
+  &lt;li&gt;lawson flip’&lt;/li&gt;
+  &lt;li&gt;Sort_vertices.&lt;/li&gt;
+&lt;/ol&gt;</content><author><name>Tingyu Song</name></author><category term="Graphics" /><category term="delaunay" /><summary type="html">This is a review of reading delaunay code’s problem.</summary></entry><entry><title type="html">ReMesh With Geodesic</title><link href="http://localhost:4000/graphics/2021/08/30/ReMesh-With-Geodesic.html" rel="alternate" type="text/html" title="ReMesh With Geodesic" /><published>2021-08-30T00:00:00+08:00</published><updated>2021-08-30T00:00:00+08:00</updated><id>http://localhost:4000/graphics/2021/08/30/ReMesh%20With%20Geodesic</id><content type="html" xml:base="http://localhost:4000/graphics/2021/08/30/ReMesh-With-Geodesic.html">&lt;h3 id=&quot;1-intro&quot;&gt;1 Intro&lt;/h3&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://github.com/nmwsharp/polyscope&quot;&gt;Polyscope&lt;/a&gt; is used to visualize the data we got, which is what I also want to build one.&lt;/p&gt;
+
+&lt;p&gt;And this project is processed under instruction of Feichao Tian. Thanks a lot for his rich experience and patience.&lt;/p&gt;
+
+&lt;h3 id=&quot;2-process&quot;&gt;2 Process&lt;/h3&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;
+    &lt;p&gt;We get out geodesic process from this paper &lt;a href=&quot;https://onlinelibrary.wiley.com/doi/full/10.1111/cgf.14371&quot;&gt;Geodesic Distance Computation via Virtual Source Propagation&lt;/a&gt;. It has O(N) linear time complexity. And what we appericate this paper is that, it’s not so heavy and his way to construct indices of mesh is unusual.&lt;/p&gt;
+
+    &lt;p&gt;Because researchers won’t always consider the non-manifold solution. We want to fix this problem in his code. But unfortunately, some T situations happen.&lt;/p&gt;
+
+    &lt;p&gt;And below is the picture which we map the geodesic data to a texture.&lt;/p&gt;
+
+    &lt;p&gt;&lt;img src=&quot;/assets/geodesic/contour.png&quot; alt=&quot;Fig. 1&quot; /&gt;&lt;/p&gt;
+
+    &lt;center&gt;Fig. 1. countour result&lt;/center&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;We want to plug nodes on geodesic lines. First we get geodesic lines, and then plug nodes with a constant delta on it.  The delta is the plugging nodes’ distance away from each other. And we can got this. The first picture is the geodesic lines we got. Blue lines are contour texture, and the yellow lines are geodesic lines.  And the second picture is the plugged points. While this time, geodesic lines is blue, and plugged point is yellow.&lt;/p&gt;
+
+    &lt;p&gt;&lt;img src=&quot;/assets/geodesic/line.png&quot; alt=&quot;Fig. 2&quot; /&gt;&lt;/p&gt;
+
+    &lt;center&gt;Fig. 2. geodesic line visualization&lt;/center&gt;
+
+    &lt;p&gt;&lt;img src=&quot;/assets/geodesic/plugged.png&quot; alt=&quot;Fig. 3&quot; /&gt;&lt;/p&gt;
+
+    &lt;center&gt;Fig. 3. inserted nodes visualization&lt;/center&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;Third, we generate deluanay triangle from these plug nodes. We get those plug nodes and their faceID. And sort them by their faceid. After sorted, we deluanay triangulate the mesh triangle by triangle. Below is this step’s result.&lt;/p&gt;
+
+    &lt;p&gt;&lt;img src=&quot;/assets/geodesic/deluanay.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+    &lt;center&gt;Fig. 4. deluanay triangulation&lt;/center&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;Fourth, we need some flip operations and merge operations to do this. In this step, we use pmp-library as our tools. We use it to do flip and merge operations.&lt;/p&gt;
+
+    &lt;p&gt;&lt;img src=&quot;/assets/geodesic/flip&amp;amp;merge.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+    &lt;center&gt; Fig. 5. flip &amp;amp; merge operations &lt;/center&gt;
+
+    &lt;p&gt;First we do clip until there is no edges to flip or only few edges to flip. Then we do merge, merge the origin input mesh’s vertex to the inserted nodes.&lt;/p&gt;
+
+    &lt;p&gt;&lt;img src=&quot;/assets/geodesic/merge_res.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+    &lt;center&gt;Fig. 6.  Final result&lt;/center&gt;
+  &lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h3 id=&quot;3-result&quot;&gt;3 Result&lt;/h3&gt;
+
+&lt;p&gt;We’ve tested several models. And the program robusty is guaranteed.&lt;/p&gt;
+
+&lt;p&gt;Below are results for complicate models.&lt;/p&gt;
+
+&lt;p&gt;.&lt;img src=&quot;/assets/geodesic/armadillo.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;center&gt;Fig. 7. armadillo origin&lt;/center&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/geodesic/armadillo_remesh.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;center&gt;Fig. 8. remesh armadillo&lt;/center&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/geodesic/beetle.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;center&gt;Fig. 9. beetle origin&lt;/center&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/geodesic/beetle_remesh.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;center&gt;Fig. 10. remesh beetle&lt;/center&gt;</content><author><name>[&quot;Feichao Tian&quot;, &quot;Tingyu Song&quot;]</name></author><category term="Graphics" /><category term="remesh" /><category term="geodesic" /><category term="delaunay" /><summary type="html">1 Intro</summary></entry></feed>
