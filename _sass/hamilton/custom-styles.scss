@@ -1,1 +1,69 @@
 // Placeholder to allow customizing styles.
+.about-content {
+    font-family: "Arial Narrow",Arial;
+    margin-bottom: $spacing-unit;
+  
+    h2, h3, h4, h5, h6 {
+      font-family: "Arial Narrow",Arial;
+    }
+  
+    h2         { 
+        margin-top: $spacing-unit / 8;
+        margin-bottom: $spacing-unit / 4;
+    }
+    h3         { margin-top: $spacing-unit * 1 }
+    h4, h5, h6 { margin-top: $spacing-unit }
+  
+    h2 {
+      @include relative-font-size(1.4);
+  
+      @media screen and (min-width: $on-large) {
+        @include relative-font-size(1.5);
+      }
+    }
+  
+    h3 {
+      @include relative-font-size(1.17);
+    }
+  
+    h4 {
+      @include relative-font-size(1.12);
+    }
+  
+    h5 {
+      @include relative-font-size(0.83);
+    }
+  
+    h6 {
+      @include relative-font-size(0.75);
+    }
+  
+    li {
+      margin-bottom: $spacing-unit / 5;
+  
+      > ul {
+        margin-top: 0;
+        margin-bottom: 0;
+      }
+      > ol {
+        margin-top: 0;
+        margin-bottom: 0;
+      }
+  
+      p, blockquote, pre, figure, iframe, %vertical-rhythm {
+        margin-bottom: $spacing-unit / 8;
+        margin-top : $spacing-unit / 8;
+      }
+    }
+
+    p {
+        margin-bottom: $spacing-unit / 8;
+        margin-top : $spacing-unit / 8;
+    }
+
+    ul {
+        margin-top: $spacing-unit / 8;
+        margin-bottom: $spacing-unit / 8;
+    }
+  }
+  

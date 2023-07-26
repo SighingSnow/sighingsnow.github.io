@@ -960,3 +960,45 @@ figcaption.align-center {
     .footer-col:last-child {
       padding-right: 0;
       padding-left: 1rem; } }
+.about-content {
+  font-family: "Arial Narrow",Arial;
+  margin-bottom: 2rem; }
+  .about-content h2, .about-content h3, .about-content h4, .about-content h5, .about-content h6 {
+    font-family: "Arial Narrow",Arial; }
+  .about-content h2 {
+    margin-top: 0.25rem;
+    margin-bottom: 0.5rem; }
+  .about-content h3 {
+    margin-top: 2rem; }
+  .about-content h4, .about-content h5, .about-content h6 {
+    margin-top: 2rem; }
+  .about-content h2 {
+    font-size: 1.4rem; }
+    @media screen and (min-width: 1100px) {
+      .about-content h2 {
+        font-size: 1.5rem; } }
+  .about-content h3 {
+    font-size: 1.17rem; }
+  .about-content h4 {
+    font-size: 1.12rem; }
+  .about-content h5 {
+    font-size: 0.83rem; }
+  .about-content h6 {
+    font-size: 0.75rem; }
+  .about-content li {
+    margin-bottom: 0.4rem; }
+    .about-content li > ul {
+      margin-top: 0;
+      margin-bottom: 0; }
+    .about-content li > ol {
+      margin-top: 0;
+      margin-bottom: 0; }
+    .about-content li p, .about-content li blockquote, .about-content li pre, .about-content li figure, .about-content li iframe, .about-content li .highlight {
+      margin-bottom: 0.25rem;
+      margin-top: 0.25rem; }
+  .about-content p {
+    margin-bottom: 0.25rem;
+    margin-top: 0.25rem; }
+  .about-content ul {
+    margin-top: 0.25rem;
+    margin-bottom: 0.25rem; }
