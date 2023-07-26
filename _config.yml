@@ -30,13 +30,10 @@ exclude:
 
 # Jekyll SEO Tag (Optional)
 # =========================
-twitter:
-  username: ???
-  card: summary
 logo: logo.jpg
 social:
   name: Tingyu Song
   links:
-    - https://github.com/SighingSnowAtom
+    - https://github.com/SighingSnow
 google_site_verification: u4WXQl0Eu66rsQo2kRdCNx
 lang: en
