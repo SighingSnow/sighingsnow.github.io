@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>Delaunay triangulation | Tingyu Song’s Blog</title>
+<meta name="generator" content="Jekyll v3.9.3" />
+<meta property="og:title" content="Delaunay triangulation" />
+<meta name="author" content="Tingyu Song" />
+<meta property="og:locale" content="en" />
+<meta name="description" content="This is a review of reading delaunay code’s problem." />
+<meta property="og:description" content="This is a review of reading delaunay code’s problem." />
+<link rel="canonical" href="http://localhost:4000/graphics/2021/09/03/Detri2.html" />
+<meta property="og:url" content="http://localhost:4000/graphics/2021/09/03/Detri2.html" />
+<meta property="og:site_name" content="Tingyu Song’s Blog" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2021-09-03T00:00:00+08:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Delaunay triangulation" />
+<meta name="twitter:site" content="@???" />
+<meta name="twitter:creator" content="@Tingyu Song" />
+<meta name="google-site-verification" content="u4WXQl0Eu66rsQo2kRdCNx" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Tingyu Song"},"dateModified":"2021-09-03T00:00:00+08:00","datePublished":"2021-09-03T00:00:00+08:00","description":"This is a review of reading delaunay code’s problem.","headline":"Delaunay triangulation","mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/graphics/2021/09/03/Detri2.html"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"http://localhost:4000/logo.jpg"},"name":"Tingyu Song"},"url":"http://localhost:4000/graphics/2021/09/03/Detri2.html"}</script>
+<!-- End Jekyll SEO tag -->
+
+
+<link type="application/atom+xml" rel="alternate" href="http://localhost:4000/feed.xml" title="Tingyu Song's Blog" />
+
+
+
+
+
+<!-- Google Fonts -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open%20Sans|Roboto|Roboto%20Slab|Inconsolata|Dancing%20Script|Noto%20Sans%20SC|Noto%20Sans%20TC|Noto%20Serif%20SC|Noto%20Serif%20TC|Ma%20Shan%20Zheng">
+
+<link rel="stylesheet" href="/assets/css/main.css">
+<link rel="stylesheet" href="/assets/css/skin.css">
+
+<!-- Begin selecting skin -->
+
+  <script>
+    const hour = (new Date()).getHours();
+    let filename = "";
+    if (hour >= 5 && hour < 7) {
+      filename = "/assets/css/skin-sunrise.css";
+    } else if (hour >= 7 && hour < 17) {
+      filename = "/assets/css/skin-daylight.css";
+    } else if (hour >= 17 && hour < 19) {
+      filename = "/assets/css/skin-sunset.css";
+    } else {
+      filename = "/assets/css/skin-midnight.css";
+    }
+    const elem = document.createElement("link");
+    elem.setAttribute("rel", "stylesheet");
+    elem.setAttribute("type", "text/css");
+    elem.setAttribute("href", filename);
+    document.getElementsByTagName("head")[0].appendChild(elem);
+  </script>
+
+<!-- End selecting skin -->
+
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-PCJN931Q3R"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-PCJN931Q3R');
+</script>
+
+<script async src="https://use.fontawesome.com/releases/v5.0.12/js/all.js"></script>
+
+
+
+
+  </head>
+
+  <body>
+    <div class="site-container">
+      <header class="site-header">
+        <div class="wrapper">
+  <script>
+    function clickSidebarButton() {
+      const elem = document.getElementById("site-sidebar")
+      if (elem.style.display == "none" || elem.style.display == "") {
+        elem.style.display = "block";
+      } else {
+        elem.style.display = "none";
+      }
+    }
+  </script>
+  <a class="site-sidebar-button" onclick="clickSidebarButton()"><i class="far fa-user"></i>
+  </a>
+
+  <a class="site-title" rel="author" href="/">Tingyu Song&#39;s Blog</a>
+
+  
+    <nav class="site-nav">
+      <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+      <label for="nav-trigger" title="nav-trigger">
+        <span class="menu-icon">
+          <svg viewBox="0 0 18 15" width="18px" height="15px">
+            <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+          </svg>
+        </span>
+      </label>
+
+      <ul class="trigger">
+              <li><a class="" href="/about/">About</a></li>
+            
+              <li><a class="" href="/years/">Years</a></li>
+            
+              <li><a class="" href="/categories/">Categories</a></li>
+            
+              <li><a class="" href="/tags/">Tags</a></li>
+            
+              <li class="dropdown" href="#">
+                <a href="javascript:void(0)" class="dropbtn">More</a>
+                <div class="dropdown-content">
+                    <a class="" href="/faq/">FAQ</a>
+                    <a class="" href="/docs/">Docs</a>
+                </div>
+              </li>
+            </ul>
+    </nav>
+  
+</div>
+
+      </header>
+      
+      <div class="site-body wrapper">
+        <aside class="site-sidebar" id="site-sidebar">
+          
+            <h3 class="toc-title">Table of Contents</h3>
+<nav class="toc-nav">
+  <ul class="toc">
+  <li><a href="#1-pipeline">1 Pipeline</a></li>
+  <li><a href="#2-example">2 Example</a>
+    <ul>
+      <li><a href="#21-conditions">2.1 Conditions</a></li>
+      <li><a href="#22-process">2.2 Process</a></li>
+    </ul>
+  </li>
+  <li><a href="#3-flip-operation">3 Flip Operation</a>
+    <ul>
+      <li><a href="#flip">FLIP</a></li>
+      <li><a href="#31-flip13">3.1 FLIP13</a></li>
+      <li><a href="#32-flip24">3.2 FLIP24</a></li>
+      <li><a href="#33-flip-42">3.3 FLIP 42</a></li>
+      <li><a href="#34-flip-22">3.4 FLIP 22</a></li>
+      <li><a href="#35-lawson-flip">3.5 Lawson Flip</a></li>
+      <li><a href="#detri2">Detri2</a></li>
+      <li><a href="#笔记">笔记</a></li>
+      <li><a href="#问题">问题</a></li>
+    </ul>
+  </li>
+</ul>
+
+</nav>
+
+          
+        </aside>
+        <main class="site-main" id="site-main" aria-label="Content" tabindex="1">
+          <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+
+    <h1 class="post-title p-name" itemprop="name headline">Delaunay triangulation</h1>
+    <p class="post-meta"><time class="dt-published" datetime="2021-09-03T00:00:00+08:00" itemprop="datePublished">
+        Sep 3, 2021
+      </time>• 
+          <span itemprop="author" itemscope itemtype="http://schema.org/Person">
+            <span class="p-author h-card" itemprop="name">Tingyu Song</span></span></p>
+
+  </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <p>This is a review of reading delaunay code’s problem.</p>
+
+<h2 id="1-pipeline">1 Pipeline</h2>
+
+<p>This pipeline is set simply on some nodes file. Many details are omitted.</p>
+
+<ol>
+  <li>Read nodes file, make nodes’ which has (x,y,z) coordinate as input.</li>
+  <li>
+    <p>Sort vertices. (<em>So for here I don’t know much, I may igorned some details</em>). Then do some initialization.</p>
+  </li>
+  <li>Then insert them one by one into the triangle. And here comes the flip operations, you can see these operations below in the flip operation.</li>
+</ol>
+
+<h2 id="2-example">2 Example</h2>
+
+<p>Below is a simple example, that maybe helpful to understand the whole pipeline.</p>
+
+<h3 id="21-conditions">2.1 Conditions</h3>
+
+<ol>
+  <li>
+    <p>Considering this, we have only 4 only points. So in this example, we will have 5 points including the infinite vertex. <em>A(1,4), B(4,0), C(1,0), D(4,3)</em> . And we made the inf_vert as <em>(0,0)</em>.</p>
+
+    <p><img src="/assets/detri2/eg_cond.png" alt="" /></p>
+  </li>
+  <li>
+    <p>As we want to test the lawson flip, we need to construct the condition first. The program will automatically sort the vertices. So we manually construct the triangle below.</p>
+  </li>
+</ol>
+
+<h3 id="22-process">2.2 Process</h3>
+
+<ol>
+  <li>
+    <p>Construct the first triangle.  The first triangle is <em>(A,B,C)</em></p>
+
+    <p><img src="/assets/detri2/eg_ctri.png" alt="" /></p>
+  </li>
+  <li>
+    <p>Here when we insert <em>D(4,3)</em>, we need to do <em>flip13</em>. The function of <em>flip13</em> you can see in the 3.1.</p>
+
+    <p>And we are gonna to explain  <em>flip13</em> in detail.</p>
+
+    <p>So first we get 3 vertices of the first triangle.</p>
+
+    <div class="language-c++ highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">Vertex</span> <span class="o">*</span><span class="n">pa</span> <span class="o">=</span> <span class="n">tt</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">org</span><span class="p">();</span> <span class="c1">// pa(1,4)</span>
+<span class="n">Vertex</span> <span class="o">*</span><span class="n">pb</span> <span class="o">=</span> <span class="n">tt</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">dest</span><span class="p">();</span> <span class="c1">// pb(4,0)</span>
+<span class="n">Vertex</span> <span class="o">*</span><span class="n">pc</span> <span class="o">=</span> <span class="n">tt</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">apex</span><span class="p">();</span> <span class="c1">// pc(1,0)</span>
+</code></pre></div>    </div>
+    <p>And then we use a for loop to travel through the half-edges of this triangle and get all the neighbor halfedges.</p>
+
+    <div class="language-c++ highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">for</span> <span class="p">(</span><span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="mi">3</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+  <span class="n">nn</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">tt</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">esym</span><span class="p">();</span> <span class="c1">// nn[0] = B-&gt;A, nn[1] = C-&gt;B, nn[2] = A-&gt;C</span>
+  <span class="n">tt</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">ver</span> <span class="o">=</span> <span class="n">_enext_tbl</span><span class="p">[</span><span class="n">tt</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">ver</span><span class="p">];</span>
+<span class="p">}</span>
+</code></pre></div>    </div>
+
+    <p>Construct three edges, <em>tt[0] (A,B,D), tt[1] (B,C,D), tt[2] (C,A,D)</em>. This operation can be understood when the vert is in triangle. But it’s may be hard when it’s outside the triangle.</p>
+
+    <p><img src="/assets/detri2/eg_nn.png" alt="" /></p>
+
+    <p>And we use the origin to nn to connect the newly created triangles. Meanwhile, we need to set boundary, exterior and some other parameters which I didn’t pay much attention to it now.</p>
+
+    <p><strong>After we create 3 new triangle(maybe), we will step into the next stage. There are some edges to flip. We need to collect them and have a check.</strong></p>
+
+    <p><img src="/assets/detri2/eg_3new.png" alt="" /></p>
+
+    <p><strong>Collect.</strong> In <em>flip13</em>, first we need to collect the tt[i], that is <em>A-&gt;B, B-&gt;C, C-&gt;A</em> these 3 edges. After this, we need to collect the paired half-edges. The code is below. From my opinion, it’s just travel around all the triangle which is adj to triangle A,B,C. And finally return back.</p>
+
+    <div class="language-c++ highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">do</span> <span class="p">{</span>
+        <span class="n">N</span><span class="p">.</span><span class="n">set_edge_infect</span><span class="p">();</span>
+        <span class="o">*</span> <span class="p">(</span><span class="n">TriEdge</span> <span class="o">*</span><span class="p">)</span> <span class="n">fqueue</span><span class="o">-&gt;</span><span class="n">alloc</span><span class="p">()</span> <span class="o">=</span> <span class="n">N</span><span class="p">;</span>
+        <span class="n">N</span> <span class="o">=</span> <span class="n">N</span><span class="p">.</span><span class="n">eprev_esym</span><span class="p">();</span>
+<span class="p">}</span> <span class="k">while</span> <span class="p">(</span><span class="n">N</span><span class="p">.</span><span class="n">tri</span> <span class="o">!=</span> <span class="p">(</span><span class="o">*</span><span class="n">ppt</span><span class="p">)</span><span class="o">-&gt;</span><span class="n">adj</span><span class="p">.</span><span class="n">tri</span><span class="p">);</span>
+</code></pre></div>    </div>
+
+    <p>You can see 3 other edges are pushed into the fqueue, which are to flipped.</p>
+
+    <p><img src="/assets/detri2/eg_travel.png" alt="" /></p>
+  </li>
+  <li>
+    <p>And we come to the key stage. Current triangulation is not deluanay triangle. We need <em>lawson flip</em> to check it.</p>
+
+    <p><img src="/assets/detri2/eg_needflip.png" alt="" /></p>
+
+    <p>In lawson flip, we need to check the edges which may need flip operations.</p>
+
+    <div class="language-c++ highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">ori</span> <span class="o">=</span> <span class="nb">false</span><span class="p">;</span> <span class="n">ishullflip</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+<span class="n">tt</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="o">*</span><span class="n">pte</span><span class="p">;</span> <span class="c1">// a-&gt;b-&gt;d</span>
+<span class="n">tt</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">tt</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">esym</span><span class="p">();</span> <span class="c1">// c-&gt;b-&gt;a </span>
+<span class="c1">// both of them or not hull triangle</span>
+<span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">tt</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">tri</span><span class="o">-&gt;</span><span class="n">is_hulltri</span><span class="p">())</span> <span class="p">{</span>
+  <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">tt</span><span class="p">[</span><span class="mi">1</span><span class="p">].</span><span class="n">tri</span><span class="o">-&gt;</span><span class="n">is_hulltri</span><span class="p">())</span> <span class="p">{</span>
+    <span class="c1">// An interior edge.</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">op_db_verbose</span> <span class="o">&gt;</span> <span class="mi">3</span><span class="p">)</span> <span class="p">{</span>
+      <span class="n">printf</span><span class="p">(</span><span class="s">"      O3d: (%d, %d, %d, %d)</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="n">tt</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">org</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">idx</span><span class="p">,</span> <span class="n">tt</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">dest</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">idx</span><span class="p">,</span> <span class="n">tt</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">apex</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">idx</span><span class="p">,</span> <span class="n">tt</span><span class="p">[</span><span class="mi">1</span><span class="p">].</span><span class="n">apex</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">idx</span><span class="p">);</span>
+    <span class="p">}</span>
+    <span class="n">ori</span> <span class="o">=</span> <span class="n">regular_test</span><span class="p">(</span><span class="n">tt</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">org</span><span class="p">(),</span> <span class="n">tt</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">dest</span><span class="p">(),</span> <span class="n">tt</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">apex</span><span class="p">(),</span> <span class="n">tt</span><span class="p">[</span><span class="mi">1</span><span class="p">].</span><span class="n">apex</span><span class="p">());</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>    </div>
+
+    <p>（这里有不理解，这里传进去的是<em>A,B,D,C</em>，而Orient3D的意思是如果C在ABD平面下方则为正数返回）</p>
+  </li>
+  <li>
+    <p>“When the <em>ori</em> get from the step 3 is generated, and <em>ori&gt;0</em>, then the edge is locally non-regular and non-convex.”   (这里的non-regular 以及 non-convex是什么意思。) So we need to use <em>flip_check</em> to check how to flip this edge. And we get <em>AB</em> intersects with <em>CD</em>, so we need to use flip22 to delete AB.</p>
+
+    <p>In <em>flip22</em>, the main operation is to build two new triangle, which is <em>(c,d,b) and (d,c,a)</em>. The result is shown below in the picture. And rebuild the connection. After <em>flip22</em>, we can get some edges to flip, so we still go to lawson flip until all the edges needing flip are emptied.</p>
+
+    <p><img src="/assets/detri2/eg_flip22res.png" alt="" /></p>
+  </li>
+</ol>
+
+<h2 id="3-flip-operation">3 Flip Operation</h2>
+
+<h3 id="flip">FLIP</h3>
+
+<ol>
+  <li>Do FLIP operation according to the vertex pos. We have flip13, flip22, flip24, flip42 and so on.</li>
+  <li>Then we need to get the vertices which are infected. And then push the infected edges into it. For FLIP13 and FLIP24, we not only add the origin triangle edge also the newly created 3 edges.</li>
+</ol>
+
+<h3 id="31-flip13">3.1 FLIP13</h3>
+
+<p>This situation happen’s when the vertex to be inserted is in triangle or outside the triangle.</p>
+
+<ol>
+  <li>
+    <p>Find the neighbors of triangle which the edge is on.</p>
+  </li>
+  <li>
+    <p>Counstruct new 3 triangles.</p>
+
+    <p><img src="/assets/detri2/flip13.png" alt="image-20210903120318607" /></p>
+  </li>
+  <li>
+    <p>Connect the newly constructed triangles with the neighbors found previously.</p>
+  </li>
+  <li>
+    <p>After that, set the hull tag？ I don’t know much about it.</p>
+  </li>
+</ol>
+
+<h3 id="32-flip24">3.2 FLIP24</h3>
+
+<p>This situation happen’s when the vertex is on one edge. I made a special</p>
+
+<h3 id="33-flip-42">3.3 FLIP 42</h3>
+
+<h3 id="34-flip-22">3.4 FLIP 22</h3>
+
+<h3 id="35-lawson-flip">3.5 Lawson Flip</h3>
+
+<p>Lawson flip is to make some cases which is not a Delaunay triangulation to a Delaunay triangulation.</p>
+
+<p>Below picture refers from <a href="https://www.ti.inf.ethz.ch/ew/Lehre/CG13/lecture/Chapter 6.pdf">ti.inf.ethz.ch/ew/CG13/lecture</a>. So what the lawson’s flip do in the below picture is to turn (b)  to (a) in order to satisfy the constraints of Delaunay triangulation.</p>
+
+<p><img src="/assets/detri2/lawson.png" alt="" /></p>
+
+<p>I used a special case to test lawson flip. Below is the case, we have 4 coordinates, which is 
+\(a(0,0), b(3,0), c(0,4),d(3,3)\)
+As the algorithm random permute the vertices at the beginning, I made the first triangle manually which is (a,b,c). And now what we need to do is to insert d(3,3). Below is the situation.</p>
+
+<p><img src="/assets/detri2/lawson_situation.png" alt="image-20210903120318607" /></p>
+
+<p>So, after we insert the d(3.0,3.0) into the plane. We will note d is in the external circle of  triangle(a,b,c).</p>
+
+<h3 id="detri2">Detri2</h3>
+
+<ol>
+  <li>What’s the segment here ?</li>
+  <li>a inf vertex</li>
+  <li>what is hull triangle</li>
+</ol>
+
+<p>process is below</p>
+
+<div class="language-c++ highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">initialize</span><span class="p">(){</span>
+  <span class="c1">// init vertex and segment</span>
+  <span class="c1">// a infvertex</span>
+  <span class="n">initialize_lookup_table</span><span class="p">();</span> <span class="c1">// init the bitmasks</span>
+  <span class="n">reset_options</span><span class="p">();</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<div class="language-c++ highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">Triangulation</span> <span class="n">tr</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">Triangulation</span><span class="p">();</span>
+<span class="n">tr</span><span class="o">-&gt;</span><span class="n">parse_commands</span><span class="p">(</span><span class="n">argc</span><span class="p">,</span><span class="n">argv</span><span class="p">);</span>
+<span class="n">tr</span><span class="o">-&gt;</span><span class="n">read_mesh</span><span class="p">();</span>
+<span class="n">tr</span><span class="o">-&gt;</span><span class="n">reconstruct_mesh</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+</code></pre></div></div>
+
+<p>排序之后开始插点，如果三角形为空，就从里面拿3个出来。之后还需要新建三个假的邻接三角形。接下来开始插点，插点首先要确定点的位置。进入locate_point，根据点位返回不同的结果，有在三角形里，在边上，在点上有点不理解。得到如果为逆时针，就变成顺时针。做flip操作，每一种情况都有对应的lawson flip。flip之后进行lawson flip。lawson flip实际上是说，需要递归的去翻转点边。</p>
+
+<div class="language-c++ highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">void</span> <span class="nf">exactinit</span><span class="p">(</span><span class="kt">int</span> <span class="n">verbose</span><span class="p">,</span> <span class="kt">int</span> <span class="n">noexact</span><span class="p">,</span> <span class="kt">int</span> <span class="n">o3dfilter</span><span class="p">,</span> <span class="kt">int</span> <span class="n">ispfilter</span><span class="p">,</span> <span class="n">REAL</span> <span class="n">maxx</span><span class="p">,</span> <span class="n">REAL</span> <span class="n">maxy</span><span class="p">,</span> <span class="n">REAL</span> <span class="n">maxz</span><span class="p">)</span>
+<span class="kt">int</span> <span class="n">Triangulation</span><span class="o">::</span><span class="n">sort_vertices</span><span class="p">(</span><span class="n">Vertex</span><span class="o">*</span> <span class="n">vrtarray</span><span class="p">,</span> <span class="kt">int</span> <span class="n">arysize</span><span class="p">,</span> <span class="n">Vertex</span><span class="o">**&amp;</span> <span class="n">permutarray</span><span class="p">)</span>
+  <span class="kt">void</span> <span class="n">brio_multiscale_sort2</span><span class="p">(</span><span class="n">permutarray</span><span class="p">,</span> <span class="n">arysize</span><span class="p">,</span> <span class="n">so_brio_threshold</span><span class="p">,</span>
+                          <span class="n">so_brio_ratio</span><span class="p">,</span> <span class="n">so_hilbert_order</span><span class="p">,</span> <span class="n">so_hilbert_limit</span><span class="p">,</span>
+                          <span class="n">io_xmin</span><span class="p">,</span> <span class="n">io_xmax</span><span class="p">,</span> <span class="n">io_ymin</span><span class="p">,</span> <span class="n">io_ymax</span><span class="p">);</span>
+</code></pre></div></div>
+
+<p>重要的类</p>
+
+<div class="language-c++ highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Triangulation</span><span class="p">{</span>
+  <span class="nl">public:</span>
+  <span class="n">arraypool</span><span class="o">*</span> <span class="n">tr_steiners</span><span class="p">;</span> <span class="c1">// Stenier vertices 狭窄的顶点？？？</span>
+  <span class="n">arraypool</span><span class="o">*</span> <span class="n">tr_segs</span><span class="p">;</span>
+  <span class="n">arraypool</span><span class="o">*</span> <span class="n">tr_tris</span><span class="p">;</span> <span class="c1">// exm这又是啥</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<ol>
+  <li>
+    <p>Locate_point 三角形</p>
+
+    <p>当没有三角形时从0构建1个。并且确定是顺时针还是逆时针。里面判断hull triangle。</p>
+  </li>
+  <li>
+    <p>Flip13 遍历三角形的所有边，拿到邻接的所有三角形。</p>
+  </li>
+</ol>
+
+<h3 id="笔记">笔记</h3>
+
+<ol>
+  <li>Orient2D是一个线性规划，解一个不等式</li>
+  <li>使用exactinit的原因可以在 <a href="http://www.cs.cmu.edu/~quake/triangle.exact.html">triangle_exact</a></li>
+  <li>这些名词解释很有用<a href="http://www.cs.cmu.edu/~quake/triangle.defs.html">definition</a></li>
+</ol>
+
+<h3 id="问题">问题</h3>
+
+<ol>
+  <li>在初始化Triangulation时，初始化了一个tr_infvrt，这个tr_infvrt是什么。</li>
+  <li>在放点的时候，要找到一个说组成的三角形位置是逆时针的，但这个edge为什么可以表示为3个点。</li>
+  <li>locate_point没看懂。看懂了，是个线性规划。</li>
+  <li>为什么需要维护一个内存池子，懂了因为这个池子里是需要翻转的边。</li>
+  <li>Delaunay 45 行，</li>
+  <li>这个locate point是不是有点类似于正弦定理，乘出来小于0就怎样，大于0就怎样。如果这个点在三角形里，他需要满足和其中的两个三角形为逆时针。</li>
+  <li>为什么需要 _vo , _vd, _va这三个数组。</li>
+  <li>TriEdge里的 apex(), org(), dest() 的原型是什么，org-&gt;origin, dest-&gt;destination,可是为什么是个函数。</li>
+  <li>
+    <p>PSLG的定义还不太理解“<em>Segments</em> are edges whose endpoints are vertices in the PSLG, and whose presence in any mesh generated from the PSLG is enforced.” 以及<strong>CCDT</strong>，<strong>CDT</strong></p>
+  </li>
+  <li>is_hulltriangle()</li>
+  <li>what’s flip ?</li>
+  <li>Set_edge_infected 一个位操作</li>
+  <li>hull flag</li>
+  <li>what’s boundary marker?</li>
+  <li>Flips 924  exposed edges.</li>
+  <li>lawson’s flip  Delaunay 265 ? locally regular?</li>
+  <li>When will flip42 and flip22 be used.</li>
+  <li>lawson flip’</li>
+  <li>Sort_vertices.</li>
+</ol>
+
+
+  </div>
+
+  <footer class="post-footer">
+    
+      <div class="post-meta">
+        <i class="fas fa-folder"></i>
+        <ul class="post-taxonomies post-categories">
+          
+          
+            <li class="post-category">
+              
+              <a href="/categories/#graphics">Graphics</a>
+            </li>
+          
+        </ul>
+      </div>
+    
+
+    
+      <div class="post-meta">
+        <i class="fas fa-tags"></i>
+        <ul class="post-taxonomies post-tags">
+          
+          
+            <li class="post-tag">
+              
+              <a href="/tags/#delaunay">delaunay</a>
+            </li>
+          
+        </ul>
+      </div>
+    
+
+    <nav class="post-pagination" role="navigation">
+      
+        <a class="post-previous" href="/graphics/2021/08/30/ReMesh-With-Geodesic.html">
+          <h4 class="post-pagination-label">Prev</h4>
+          <span class="post-pagination-title">
+            <i class="fas fa-arrow-left"></i> ReMesh With Geodesic
+
+          </span>
+        </a>
+      
+
+      
+        <a class="post-next" href="/arch/2022/04/11/Neptune.html">
+          <h4 class="post-pagination-label">Next</h4>
+          <span class="post-pagination-title">
+            Neptune
+ <i class="fas fa-arrow-right"></i>
+          </span>
+        </a>
+      
+    </nav>
+  </footer>
+
+  
+  
+</article>
+
+          <footer class="site-footer">
+            <div class="footer-col-wrapper">
+
+  <div class="footer-col">
+    <div class="copyright">
+      
+      
+      
+      
+      <p>Copyright © 2021&nbsp;-&nbsp;2023 Tingyu Song; All rights reserved.</p>
+      
+    </div>
+    <p>
+      Powered by <a href="https://jekyllrb.com/">Jekyll</a> & <a href="https://github.com/ngzhio/jekyll-theme-hamilton">Hamilton</a>
+    </p>
+  </div>
+
+  <div class="footer-col">
+    <p></p>
+  </div>
+</div>
+
+          </footer>
+        </main>
+      </div>
+    </div>
+  </body>
+
+</html>
