@@ -4,6 +4,7 @@ toc: true
 title: "Convert AVframe to QVideoframe"
 categories: Multimedia
 tags: [Multimedia,ffmpeg,qt]
+comments: true
 author: 
   - Tingyu Song 
 ---

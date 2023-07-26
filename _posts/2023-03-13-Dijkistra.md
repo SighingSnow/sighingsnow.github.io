@@ -3,6 +3,7 @@ layout: post
 toc: true
 title: "Dijkistra Optimize"
 categories: OI
+comments: true
 tags: [OI,图]
 author: 
   - Tingyu Song 

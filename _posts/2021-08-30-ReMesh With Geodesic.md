@@ -4,6 +4,7 @@ toc: true
 title: "ReMesh With Geodesic"
 categories: Graphics
 tags: [remesh, geodesic, delaunay]
+comments : true
 author:
    - Feichao Tian
    - Tingyu Song

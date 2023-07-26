@@ -5,6 +5,7 @@ title: "RISV-CPU"
 categories: Arch
 tags: [RISCV,CPU]
 author: Tingyu Song 
+comments: true
 ---
 
 # CS61CPU
