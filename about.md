@@ -6,7 +6,7 @@ permalink: /about/
 
 ## Intro
 
-I am a master student in Big Data Research Center at Chongqing Institute of Green and Intelligent Technology, University of Chinese Academy of Sciences. And I am interested in Computer Graphics, Machine Learning and some other fields.
+I am a master student in Big Data Research Center at Chongqing Institute of Green and Intelligent Technology, University of Chinese Academy of Sciences, advised by [Hong Xie](https://hongxie.github.io/). I'm currently doing some work in LLM and out-of-distribution field. Also I am very interested in Computer Graphics.
 
 ---
 

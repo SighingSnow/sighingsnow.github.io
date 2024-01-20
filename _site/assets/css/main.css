@@ -997,8 +997,8 @@ figcaption.align-center {
       margin-bottom: 0.25rem;
       margin-top: 0.25rem; }
   .about-content p {
-    margin-bottom: 0.25rem;
-    margin-top: 0.25rem; }
+    margin-bottom: 0;
+    margin-top: 0; }
   .about-content ul {
-    margin-top: 0.25rem;
-    margin-bottom: 0.25rem; }
+    margin-top: 0;
+    margin-bottom: 0; }
