@@ -1,4 +1,20 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en"><generator uri="https://jekyllrb.com/" version="3.9.3">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" hreflang="en" /><updated>2024-01-25T00:21:03+08:00</updated><id>http://localhost:4000/feed.xml</id><title type="html">Tingyu Song’s Blog</title><author><name>Tingyu Song</name></author><entry><title type="html">OOD Paper List</title><link href="http://localhost:4000/ml/2024/01/20/OOD-Paper-List.html" rel="alternate" type="text/html" title="OOD Paper List" /><published>2024-01-20T00:00:00+08:00</published><updated>2024-01-20T00:00:00+08:00</updated><id>http://localhost:4000/ml/2024/01/20/OOD%20Paper%20List</id><content type="html" xml:base="http://localhost:4000/ml/2024/01/20/OOD-Paper-List.html">&lt;h2 id=&quot;ood-paper-list&quot;&gt;OOD Paper List&lt;/h2&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en"><generator uri="https://jekyllrb.com/" version="3.9.3">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" hreflang="en" /><updated>2025-06-04T22:15:52+08:00</updated><id>http://localhost:4000/feed.xml</id><title type="html">Tingyu Song’s Blog</title><author><name>Tingyu Song</name></author><entry><title type="html">A quick start of WebGPU</title><link href="http://localhost:4000/graphics/2025/01/01/WebGPU-App.html" rel="alternate" type="text/html" title="A quick start of WebGPU" /><published>2025-01-01T00:00:00+08:00</published><updated>2025-01-01T00:00:00+08:00</updated><id>http://localhost:4000/graphics/2025/01/01/WebGPU%20App</id><content type="html" xml:base="http://localhost:4000/graphics/2025/01/01/WebGPU-App.html">&lt;p&gt;I followed the &lt;a href=&quot;https://codelabs.developers.google.com/your-first-webgpu-app#0.&quot;&gt;your-first-webgpu-app&lt;/a&gt; and finished the course in my spare time.&lt;/p&gt;
+
+&lt;p&gt;And the result is as follows:
+&lt;img src=&quot;/assets/webgpu/result.gif&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;The code is quite straightforward, but why I wrote this blog is that I was inspired by the course.&lt;/p&gt;
+
+&lt;p&gt;So, the takeaways are as follows:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;
+    &lt;p&gt;A compute shader is an effective way to leverage the GPU for calculations. Sometimes, we don’t have ready-made solutions for certain scenarios. Reflecting on this reminds me of when I used the CPU for similar calculations in the past.&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;Ping-pong buffer usage: I have occasionally experimented with this type of buffer in my projects. In the past, I relied on approaches involving mutexes or semaphores to manage the pipeline. However, knowing about this buffer and its name earlier could have saved me considerable time. With the proper terminology, I could have directly searched for and adopted useful design patterns instead of reinventing the wheel in a naive way.&lt;/p&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;</content><author><name>[&quot;Tingyu Song&quot;]</name></author><category term="Graphics" /><category term="web" /><category term="webgpu" /><summary type="html">I followed the your-first-webgpu-app and finished the course in my spare time.</summary></entry><entry><title type="html">OOD Paper List</title><link href="http://localhost:4000/ml/2024/01/20/OOD-Paper-List.html" rel="alternate" type="text/html" title="OOD Paper List" /><published>2024-01-20T00:00:00+08:00</published><updated>2024-01-20T00:00:00+08:00</updated><id>http://localhost:4000/ml/2024/01/20/OOD%20Paper%20List</id><content type="html" xml:base="http://localhost:4000/ml/2024/01/20/OOD-Paper-List.html">&lt;h2 id=&quot;ood-paper-list&quot;&gt;OOD Paper List&lt;/h2&gt;
 
 &lt;h3 id=&quot;1-read&quot;&gt;1 Read&lt;/h3&gt;
 

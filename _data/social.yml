@@ -4,3 +4,6 @@
 - title: GitHub
   url: https://github.com/SighingSnow
   icon: fab fa-github
+- title: Google Scholar
+  url: https://scholar.google.com/citations?user=gRAHCPEAAAAJ&hl=en
+  icon: fas fa-graduation-cap

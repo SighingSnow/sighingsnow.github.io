@@ -7,20 +7,22 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <!-- Begin Jekyll SEO tag v2.8.0 -->
-<title>Docs | Tingyu Song’s Blog</title>
+<title>A quick start of WebGPU | Tingyu Song’s Blog</title>
 <meta name="generator" content="Jekyll v3.9.3" />
-<meta property="og:title" content="Docs" />
-<meta name="author" content="Tingyu Song" />
+<meta property="og:title" content="A quick start of WebGPU" />
 <meta property="og:locale" content="en" />
-<link rel="canonical" href="http://localhost:4000/docs/" />
-<meta property="og:url" content="http://localhost:4000/docs/" />
+<meta name="description" content="I followed the your-first-webgpu-app and finished the course in my spare time." />
+<meta property="og:description" content="I followed the your-first-webgpu-app and finished the course in my spare time." />
+<link rel="canonical" href="http://localhost:4000/graphics/2025/01/01/WebGPU-App.html" />
+<meta property="og:url" content="http://localhost:4000/graphics/2025/01/01/WebGPU-App.html" />
 <meta property="og:site_name" content="Tingyu Song’s Blog" />
-<meta property="og:type" content="website" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2025-01-01T00:00:00+08:00" />
 <meta name="twitter:card" content="summary" />
-<meta property="twitter:title" content="Docs" />
+<meta property="twitter:title" content="A quick start of WebGPU" />
 <meta name="google-site-verification" content="u4WXQl0Eu66rsQo2kRdCNx" />
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"WebPage","author":{"@type":"Person","name":"Tingyu Song"},"headline":"Docs","publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"http://localhost:4000/logo.jpg"},"name":"Tingyu Song"},"url":"http://localhost:4000/docs/"}</script>
+{"@context":"https://schema.org","@type":"BlogPosting","dateModified":"2025-01-01T00:00:00+08:00","datePublished":"2025-01-01T00:00:00+08:00","description":"I followed the your-first-webgpu-app and finished the course in my spare time.","headline":"A quick start of WebGPU","mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/graphics/2025/01/01/WebGPU-App.html"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"http://localhost:4000/logo.jpg"}},"url":"http://localhost:4000/graphics/2025/01/01/WebGPU-App.html"}</script>
 <!-- End Jekyll SEO tag -->
 
 
@@ -119,7 +121,7 @@
                 <a href="javascript:void(0)" class="dropbtn">More</a>
                 <div class="dropdown-content">
                     <a class="" href="/faq/">FAQ</a>
-                    <a class="current-page" href="/docs/">Docs</a>
+                    <a class="" href="/docs/">Docs</a>
                 </div>
               </li>
             </ul>
@@ -132,55 +134,102 @@
       <div class="site-body wrapper">
         <aside class="site-sidebar" id="site-sidebar">
           
-            <div class="sidebar-section"><img src="/logo.jpg" class="author-avatar u-photo align-center" alt="Tingyu Song">
-  </div>
+            <h3 class="toc-title">Table of Contents</h3>
+<nav class="toc-nav">
+  
 
-<div class="sidebar-section">
-  <ul class="contact-list">
-    <li>
-        <i class="sidebar-icon fas fa-at"></i>
-        <span class="contact-info p-name">Tingyu Song</span>
-      </li>
-    <li>
-        <i class="sidebar-icon fas fa-envelope"></i>
-        <a class="contact-info u-email" href="mailto:songtingyu220@gmail.com">songtingyu220@gmail.com</a>
-      </li>
-    
-  </ul>
-</div>
-
-<div class="sidebar-section feed-subscribe">
-  <a href="/feed.xml">
-    <i class="sidebar-icon fas fa-rss"></i><span>Subscribe</span>
-  </a>
-</div>
-
-<div class="sidebar-section">
-    <ul class="social-icons">
-      <li>
-          <a class="social-icon" href="https://x.com/songtingyu220"><i class="fab fa-twitter fa-2x" title="X"></i></a>
-        </li><li>
-          <a class="social-icon" href="https://github.com/SighingSnow"><i class="fab fa-github fa-2x" title="GitHub"></i></a>
-        </li><li>
-          <a class="social-icon" href="https://scholar.google.com/citations?user=gRAHCPEAAAAJ&hl=en"><i class="fas fa-graduation-cap fa-2x" title="Google Scholar"></i></a>
-        </li>
-    </ul>
-  </div>
+</nav>
 
           
         </aside>
         <main class="site-main" id="site-main" aria-label="Content" tabindex="1">
-          <article class="post">
+          <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
 
   <header class="post-header">
-    <h1 class="post-title">Docs</h1>
+
+    <h1 class="post-title p-name" itemprop="name headline">A quick start of WebGPU</h1>
+    <p class="post-meta"><time class="dt-published" datetime="2025-01-01T00:00:00+08:00" itemprop="datePublished">
+        Jan 1, 2025
+      </time>• 
+          <span itemprop="author" itemscope itemtype="http://schema.org/Person">
+            <span class="p-author h-card" itemprop="name">Tingyu Song</span></span></p>
+
   </header>
 
-  <div class="post-content">
-    <p>A documentation page.</p>
+  <div class="post-content e-content" itemprop="articleBody">
+    <p>I followed the <a href="https://codelabs.developers.google.com/your-first-webgpu-app#0.">your-first-webgpu-app</a> and finished the course in my spare time.</p>
+
+<p>And the result is as follows:
+<img src="/assets/webgpu/result.gif" alt="" /></p>
+
+<p>The code is quite straightforward, but why I wrote this blog is that I was inspired by the course.</p>
+
+<p>So, the takeaways are as follows:</p>
+
+<ul>
+  <li>
+    <p>A compute shader is an effective way to leverage the GPU for calculations. Sometimes, we don’t have ready-made solutions for certain scenarios. Reflecting on this reminds me of when I used the CPU for similar calculations in the past.</p>
+  </li>
+  <li>
+    <p>Ping-pong buffer usage: I have occasionally experimented with this type of buffer in my projects. In the past, I relied on approaches involving mutexes or semaphores to manage the pipeline. However, knowing about this buffer and its name earlier could have saved me considerable time. With the proper terminology, I could have directly searched for and adopted useful design patterns instead of reinventing the wheel in a naive way.</p>
+  </li>
+</ul>
 
   </div>
 
+  <footer class="post-footer">
+    
+      <div class="post-meta">
+        <i class="fas fa-folder"></i>
+        <ul class="post-taxonomies post-categories">
+          
+          
+            <li class="post-category">
+              
+              <a href="/categories/#graphics">Graphics</a>
+            </li>
+          
+        </ul>
+      </div>
+    
+
+    
+      <div class="post-meta">
+        <i class="fas fa-tags"></i>
+        <ul class="post-taxonomies post-tags">
+          
+          
+            <li class="post-tag">
+              
+              <a href="/tags/#web">web</a>
+            </li>
+          
+            <li class="post-tag">
+              
+              <a href="/tags/#webgpu">webgpu</a>
+            </li>
+          
+        </ul>
+      </div>
+    
+
+    <nav class="post-pagination" role="navigation">
+      
+        <a class="post-previous" href="/ml/2024/01/20/OOD-Paper-List.html">
+          <h4 class="post-pagination-label">Prev</h4>
+          <span class="post-pagination-title">
+            <i class="fas fa-arrow-left"></i> OOD Paper List
+
+          </span>
+        </a>
+      
+
+      
+    </nav>
+  </footer>
+
+  
+  
 </article>
 
           <footer class="site-footer">
