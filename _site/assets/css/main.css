@@ -834,15 +834,11 @@ ul.post-categories li {
 
 .post-title,
 .post-content h1 {
-  font-size: 1.8rem;
-  font-family: Roboto, "Noto Sans SC", "Noto Sans TC";
-  font-weight: bold;
-  letter-spacing: -1px;
-  line-height: 54px; }
-  @media screen and (min-width: 1100px) {
-    .post-title,
-    .post-content h1 {
-      font-size: 2rem; } }
+  font-size: 1.4rem;
+  font-weight: 600;
+  letter-spacing: -0.5px;
+  line-height: 1.0;
+  margin-bottom: 0.2rem; }
 
 .post-content {
   font-family: "Roboto Slab", "Noto Serif SC", "Noto Serif TC";
