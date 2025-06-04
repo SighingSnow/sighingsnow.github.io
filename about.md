@@ -18,7 +18,7 @@ I am a PhD student at **SAIS (School of Advanced Interdisciplinary Studies), UCA
 
 <div class="edu-entry">
   <div class="title">Zhejiang University</div>
-  <div class="meta">B.S. in Computer Science And Technology· 2018 — 2023</div>
+  <div class="meta">B.S. in Computer Science And Technology · 2018 — 2023</div>
 </div>
 
 <div class="edu-entry">
