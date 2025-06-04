@@ -6,7 +6,7 @@ permalink: /about/
 
 ## 👋 Intro
 
-I am a PhD student at **SAIS (School of Advanced Interdisciplinary Studies), UCAS**, advised by *Mingsheng Shang*.  My research focuses on **Large Language Models**, **Information Retrieval**,**Multimodal LLM**, also with a strong interest in **Computer Graphics**. 
+I am a PhD student at **SAIS (School of Advanced Interdisciplinary Studies), UCAS**, advised by *Mingsheng Shang*.  My research focuses on **Large Language Models**, **Information Retrieval**, **Multimodal LLM**, also with a strong interest in **Computer Graphics**. 
 
 
 ## 🎓 Education
