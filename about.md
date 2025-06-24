@@ -6,7 +6,7 @@ permalink: /about/
 
 ## 👋 Intro
 
-I am a PhD student at **SAIS (School of Advanced Interdisciplinary Studies), UCAS**, advised by *Mingsheng Shang*.  My research focuses on **Large Language Models**, **Information Retrieval**, **Multimodal LLM**, also with a strong interest in **Computer Graphics**. 
+I am a PhD student at the **School of Advanced Interdisciplinary Studies (SAIS), UCAS**, currently studying at NLPR, supervised by [Shu Wu](https://people.ucas.ac.cn/~shuwu) and Mingsheng Shang. My research focuses on **Multimodal Large Language Models**, **Information Retrieval**, and **LLMs**. I am currently working closely with [Yilun Zhao](https://yilunzhao.github.io/).
 
 
 ## 🎓 Education
