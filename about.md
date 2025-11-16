@@ -93,7 +93,7 @@ I am a PhD student at the **School of Advanced Interdisciplinary Studies (SAIS),
 <div class="intern-entry">
   <div class="row" style="display:flex; justify-content:space-between; align-items:center;">
     <div class="title">
-      <img src="tongyi.png" style="width:18px; height:18px; vertical-align:middle; margin-right:6px;">
+      <img src="/assets/tongyi.png" style="width:18px; height:18px; vertical-align:middle; margin-right:6px;">
       Tongyi Lab
     </div>
     <div class="time">2025.07 – Present</div>
