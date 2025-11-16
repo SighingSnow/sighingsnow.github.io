@@ -75,15 +75,12 @@ I am a PhD student at the **School of Advanced Interdisciplinary Studies (SAIS),
 ## 💼 Internship
 
 <div class="intern-entry">
-  <div class="title">SenseTime</div>
-  <div class="meta">Graph Algorithms Researcher</div>
-  <div class="desc">Developed a sketch map editor and worked on graph algorithms.</div>
-</div>
-
-<div class="intern-entry">
-  <div class="title">Altair</div>
-  <div class="meta">Software Engineer</div>
-  <div class="desc">Contributed to mesh preprocessing and simulation optimization.</div>
+  <div class="row" style="display:flex; justify-content:space-between; align-items:center;">
+    <div class="title">Tongyi Lab</div>
+    <div class="time">2025.07 – Present</div>
+  </div>
+  <div class="meta">Research Intern</div>
+  <!-- <div class="desc">Multimodal retrieval. </div> -->
 </div>
 
 
