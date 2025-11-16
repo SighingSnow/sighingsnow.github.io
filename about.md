@@ -6,7 +6,7 @@ permalink: /about/
 
 ## 👋 Intro
 
-I am a PhD student at the **School of Advanced Interdisciplinary Studies (SAIS), UCAS**. I am currently studying at **Institute of Automation Chinese Academy of Sciences**, NLPR, supervised by [Shu Wu](https://people.ucas.ac.cn/~shuwu). My research focuses on **Multimodal Large Language Models**, **Information Retrieval**, and **LLMs**. I am currently working closely with [Yilun Zhao](https://yilunzhao.github.io/).
+I am a PhD student at the **School of Advanced Interdisciplinary Studies (SAIS), UCAS**. I am currently studying at **Institute of Automation Chinese Academy of Sciences**, National Laboratory of Pattern Recognition(NLPR), supervised by [Shu Wu](https://people.ucas.ac.cn/~shuwu). My research focuses on **Multimodal Large Language Models**, **Information Retrieval**, and **LLMs**. I am currently working closely with [Yilun Zhao](https://yilunzhao.github.io/).
 
 
 ## 🎓 Education
