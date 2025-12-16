@@ -1002,14 +1002,6 @@ figcaption.align-center {
         background-color: #f0f0f0; }
 
 :root {
-  --text-color: #111;
   --text-muted: #666;
   --accent-color: #007acc;
   --border-color: #ddd; }
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --text-color: #eee;
-    --text-muted: #999;
-    --accent-color: #4dabf7;
-    --border-color: #444; } }
